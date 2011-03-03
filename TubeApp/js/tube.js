@@ -340,7 +340,7 @@
 				}
 				
 				if (DEBUG) {
-					populateList(channelSubVidData, channel ? 'channelvideos' : 'newvideos');
+					populateList(channel ? channelSubVidData : newSubsData, channel ? 'channelvideos' : 'newvideos');
 				} else {
 					$.ajax({
 						type : 'GET',
