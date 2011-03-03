@@ -1,0 +1,148 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" id="viewport" content="initial-scale=1.0,user-scalable=no" />
+	<link rel="stylesheet" href="dep/jquery.mobile_1.0a3/jquery.mobile_1.0a3.min.css" />
+	<link rel="stylesheet" href="dep/organictabs/organictabs.style.css" />
+	<script type="text/javascript" src="dep/jquery_1.5/jquery_1.5.min.js"></script>
+	<script type="text/javascript" src="dep/jquery.mobile_1.0a3/jquery.mobile_1.0a3.js"></script>
+    <script type="text/javascript" src="dep/organictabs/organictabs.jquery.js"></script>
+    <script type="text/javascript" src="dep/humane.js"></script>
+	<script type="text/javascript" src="js/tube.js"></script>
+	<script type="text/javascript" src="js/cookies.js"></script>	
+	<script type="text/javascript" src="js/utils.js"></script>	
+<script type='text/javascript'>
+</script>
+</head>
+<body>
+<div data-role="page" id="login">
+
+<div data-role="header" data-theme="e">
+<h1>Sign in to YouTube</h1>
+<a href="#main" data-icon="home" data-iconpos="notext"
+	data-direction="reverse" class="ui-btn-right jqm-home">Home</a></div>
+<!-- /header -->
+
+<div data-role="content">
+	<form action="#" method="get">
+		<fieldset>
+			<div data-role="fieldcontain"><label for="name">Username:</label>
+			<input type="text" name="username" id="username" value="" /></div>
+			<div data-role="fieldcontain"><label for="search">Password:</label>
+			<input type="password" name="password" id="password" value="" /></div>
+			<!-- button type="submit" data-theme="a" name="submit" value="submit-value">Submit</button-->
+			<a href="#" id="login" data-role="button">Submit</a><br>
+			<a href="#" id="clearSession" data-role="button">Clear Session</a> 
+		</fieldset>
+	</form>
+<script type="text/javascript">	
+	$('#login').click(function() {
+		// consider using $('#username').val() and $('#password').val()
+		apptime.Tube.getInstance().login($('#username')[0].value, $('#password')[0].value);
+	});
+
+	$('#clearSession').click(function() {
+		eraseCookie('Tube.authKey');
+	});
+</script>
+</div>
+<!-- /content -->
+</div>
+<!-- /page -->
+
+<div data-role="page" id="main">
+
+	<div data-role="header" data-theme="e">
+		<h1><img src="icons/logo_withText.png"></h1>		
+	</div><!-- /header -->
+
+	<div data-role="content">
+
+			
+		<ul data-role="listview">
+			<li><img src="icons/star_full.png" alt="France" class="ui-li-icon"><a href="#browse">Popular</a> <span class="ui-li-count">4</span></li>
+			<li><img src="icons/star_full.png" alt="Germany" class="ui-li-icon"><a href="#search">Search</a> <span class="ui-li-count">4</span></li>
+			<li><img src="icons/star_full.png" alt="Great Britain" class="ui-li-icon"><a href="#favorites">Favorites</a> <span class="ui-li-count">0</span></li>
+
+			<li><img src="icons/star_full.png" alt="Japan" class="ui-li-icon"><a href="subscriptions.html" rel="external">Subscriptions</a> <span class="ui-li-count">12</span></li>
+			
+			
+
+			<li><img src="icons/star_full.png" alt="Sweden" class="ui-li-icon"><a href="#playlists">Playlists</a> <span class="ui-li-count">328</span></li>
+			<li><img src="icons/star_full.png" alt="United States" class="ui-li-icon"><a href="#myvideos">My Videos</a> <span class="ui-li-count">62</span></li>
+			<li><img src="icons/star_full.png" alt="United States" class="ui-li-icon"><a href="#login">Login</a> <span class="ui-li-count">62</span></li>
+		</ul>
+<br><br><br><br><br><br><br><br><br><br><br>
+<script type="text/javascript">
+	$('[data-role=page]').live('pagebeforeshow', function(event) {
+		var $et = $(event.target);	
+		if ($et.length > 0) {
+/*			
+			if ($et[0].id == 'favorites') {
+				Tube.prototype.getFavoritesFeed();
+			}
+*/
+			alert('id=' + $et[0].id);
+			switch($et[0].id) {
+			case 'favorites':
+				if (readCookie('Tube.authKey') == null) {		
+					alert('redirect to login');
+					$.mobile.changePage('#login');
+				} else {		
+					apptime.Tube.getInstance().getFavoritesFeed();
+				}
+				break;
+				
+			case 'login':				
+				// skip login if auth key is already there
+			//	if (readCookie('Tube.authKey')) {
+				//	alert(readCookie('Tube.authKey'));
+			//	}
+				break;
+				
+			default:
+				break;
+			}	
+		}
+	});
+</script>
+	</div><!-- /content -->
+</div><!-- /page -->
+
+
+<div data-role="page" id="favorites">
+
+<div data-role="header" data-theme="e">
+<h1>Favorites</h1>
+<a href="#main" data-icon="home" data-iconpos="notext"
+	data-direction="reverse" class="ui-btn-right jqm-home">Home</a></div>
+<!-- /header -->
+
+<div data-role="content">
+		<ul id="fav" data-role="listview">
+		</ul>
+</div>
+<!-- /content -->
+</div>
+<!-- /page -->
+
+
+<div data-role="page" id="videodetails">
+
+<div data-role="header" data-theme="e">
+<h1>[Video Title]</h1>
+<a href="../../" data-icon="home" data-iconpos="notext"
+	data-direction="reverse" class="ui-btn-right jqm-home">Home</a></div>
+<!-- /header -->
+
+<div data-role="content">
+	<div id="detail" class="ui-body ui-body-d">
+	</div>
+</div>
+<!-- /content -->
+</div>
+<!-- /page -->
+
+</body>
+</html>
