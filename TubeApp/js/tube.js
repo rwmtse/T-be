@@ -365,12 +365,15 @@
 					
 					for (var i = 0; i < feed.entry.length; i++) {
 						var entry = feed.entry[i];
-						var username = entry.yt$username.$t;
-						var item = document.createElement('li');
-						$(item).append(document.createTextNode(username));
-						
+						var username = entry.yt$username.$t;						
+
 						var link = document.createElement('a');
 						$(link).attr('href', 'subscriptions_channel.html?author=' + username);
+						$(link).attr('rel', 'external');
+						$(link).append(document.createTextNode(username));
+						
+						var item = document.createElement('li');
+						$(item).append(link);
 						
 						$('#channels').append(item);
 					}
