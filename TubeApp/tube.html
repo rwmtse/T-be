@@ -11,7 +11,8 @@
     <script type="text/javascript" src="dep/humane.js"></script>
 	<script type="text/javascript" src="js/tube.js"></script>
 	<script type="text/javascript" src="js/cookies.js"></script>	
-	<script type="text/javascript" src="js/utils.js"></script>	
+	<script type="text/javascript" src="js/utils.js"></script>
+	<script type="text/javascript" src="test_browser_js/favData.js"></script>
 <script type='text/javascript'>
 </script>
 </head>
@@ -86,12 +87,12 @@
 			alert('id=' + $et[0].id);
 			switch($et[0].id) {
 			case 'favorites':
-				if (readCookie('Tube.authKey') == null) {		
-					alert('redirect to login');
-					$.mobile.changePage('#login');
-				} else {		
+				//if (readCookie('Tube.authKey') == null) {		
+				//	alert('redirect to login');
+				//	$.mobile.changePage('#login');
+				//} else {		
 					apptime.Tube.getInstance().getFavoritesFeed();
-				}
+				//}
 				break;
 				
 			case 'login':				

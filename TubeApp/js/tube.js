@@ -62,6 +62,48 @@
 				return li;
 			};
 			
+			var getRelatedVideosFeed = function(vid) {
+				var populateList = function(feedData) {
+					var data = feedData.data;
+					var total = data.totalItems;
+					//alert('total=' + total);		
+					var maxItemsPerPage = data.itemsPerPage;
+					
+					$('ul li span').append(document.createTextNode(data.totalItems));
+					
+					// TODO: load more
+					
+					for ( var i = 0; i < data.items.length; i++) {
+						var video = data.items[i];
+									
+						if (video.content && video.content["1"]) {
+							$('#relatedvideos').append(getVideoListItem(video));
+						} else {
+							// not available for mobile?
+						}								
+					}
+					
+					$('#relatedvideos').listview('refresh');
+				};				
+				
+				if (DEBUG) {
+					populateList(relatedVidData);
+				} else {				
+					$.ajax( {
+						type : 'GET',
+						url : apptime.Tube.URL.relatedVideos.replace('_vid_', vid),
+						dataType : 'json',
+						success : function(data, textStatus, jqXHR) {
+							populateList(data);
+						},
+						error : function(xhr, type) {
+							alert(type);
+							alert(xhr.responseText);
+						}
+					});
+				}
+			};			
+			
 			var mapEntryToVideo = function(entry) {
 				var fullIdPath = entry.id.$t.split('/');
 				var title = entry.title.$t;
@@ -109,72 +151,44 @@
 				});
 			};
 			
-			this.getFavoritesFeed = function() {				
-				$.ajax( {
-					type : 'GET',
-					url : apptime.Tube.URL.favorites,
-					dataType : 'json',
-					headers : getAuthRequestHeaders(),
-					success : function(data, textStatus, jqXHR) {
-						alert(data);
-						var data = data.data;
-						var total = data.totalItems;
-						
-						var maxItemsPerPage = data.itemsPerPage;
-						for ( var i = 0; i < data.items.length; i++) {
-							var item = data.items[i];
-							var video = item.video;
-										
-							if (video.content["1"]) {
-								// TODO bug, keep appending... repeating entries
-								$('#fav').append(getVideoListItem(video));
-							} else {
-								// not available for mobile?
-							}												
-						}
-						
-						$('#fav').listview('refresh');
-					},
-					error : function(xhr, type) {
-						alert(type);
-						alert(xhr.responseText);
+			this.getFavoritesFeed = function() {
+				var populateList = function(feedData) {
+					var data = feedData.data;
+					var total = data.totalItems;
+					
+					var maxItemsPerPage = data.itemsPerPage;
+					for ( var i = 0; i < data.items.length; i++) {
+						var item = data.items[i];
+						var video = item.video;
+									
+						if (video.content["1"]) {
+							// TODO bug, keep appending... repeating entries
+							$('#fav').append(getVideoListItem(video));
+						} else {
+							// not available for mobile?
+						}												
 					}
-				});
-			};
-			
-			this.getRelatedVideosFeed = function(vid) {				
-				$.ajax( {
-					type : 'GET',
-					url : apptime.Tube.URL.relatedVideos.replace('_vid_', vid),
-					dataType : 'json',
-					success : function(data, textStatus, jqXHR) {
-						alert(data);
-						var data = data.data;
-						var total = data.totalItems;
-						alert('total=' + total);			
-						var maxItemsPerPage = data.itemsPerPage;
-						
-						$('ul li span').append(document.createTextNode(data.totalItems));
-						
-						// TODO: load more
-						
-						for ( var i = 0; i < data.items.length; i++) {
-							var video = data.items[i];
-										
-							if (video.content && video.content["1"]) {
-								$('#relatedvideos').append(getVideoListItem(video));
-							} else {
-								// not available for mobile?
-							}												
+					
+					$('#fav').listview('refresh');					
+				};
+				
+				if (DEBUG) {
+					populateList(favData);
+				} else {				
+					$.ajax( {
+						type : 'GET',
+						url : apptime.Tube.URL.favorites,
+						dataType : 'json',
+						headers : getAuthRequestHeaders(),
+						success : function(data, textStatus, jqXHR) {
+							populateList(data);
+						},
+						error : function(xhr, type) {
+							alert(type);
+							alert(xhr.responseText);
 						}
-						
-						$('#relatedvideos').listview('refresh');
-					},
-					error : function(xhr, type) {
-						alert(type);
-						alert(xhr.responseText);
-					}
-				});
+					});
+				}
 			};
 			
 			this.getVideoDetail = function() {

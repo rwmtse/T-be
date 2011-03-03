@@ -1,0 +1,64 @@
+<!DOCTYPE html> 
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" id="viewport" content="initial-scale=1.0,user-scalable=no" />
+	<link rel="stylesheet" href="dep/jquery.mobile_1.0a3/jquery.mobile_1.0a3.min.css" />
+	<link rel="stylesheet" href="dep/organictabs/organictabs.style.css" />
+	<script type="text/javascript" src="dep/jquery_1.5/jquery_1.5.min.js"></script>
+	<script type="text/javascript" src="dep/jquery.mobile_1.0a3/jquery.mobile_1.0a3.js"></script>
+    <script type="text/javascript" src="dep/organictabs/organictabs.jquery.js"></script>
+    <script type="text/javascript" src="dep/humane.js"></script>
+	<script type="text/javascript" src="js/tube.js"></script>
+	<script type="text/javascript" src="js/cookies.js"></script>	
+	<script type="text/javascript" src="js/utils.js"></script>
+	<script type="text/javascript" src="test_browser_js/relatedVidData.js"></script>
+</head>
+<body> 
+
+<div data-role="page" id="videodetails">	
+	<div data-role="header" data-theme="e">
+		<h1></h1>
+		<a href="../../" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-home">Home</a>
+	</div><!-- /header -->
+	
+	<div data-role="content">
+		<div class="ui-body ui-body-d" id="details">
+		
+			
+		</div>
+		<!--  related video list -->			
+		<ul id="relatedvideos" data-role="listview" data-inset="true">
+			<li data-role="list-divider">Related Videos <span class="ui-li-count"></span></li>
+		</ul>
+
+
+	
+
+	</div><!-- /content -->
+<script type="text/javascript">
+	$('[data-role=page]').live('pagebeforeshow', function(event) {
+		var $et = $(event.target);	
+		if ($et.length > 0) {
+			switch($et[0].id) {
+			case 'videodetails':
+				apptime.Tube.getInstance().getVideoDetail(getParameterByName('vid'));
+				break;
+			default:
+				break;
+			}	
+		}
+	});
+</script>
+<script language="javascript">
+    //$(document).ready(function () {
+      //  $("#videodetails").page("destroy").page();
+    //});
+</script>			
+</div><!-- /page -->
+
+</body>
+</html>
+
+
+
