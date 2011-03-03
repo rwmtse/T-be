@@ -312,7 +312,7 @@
 			this.getNewSubscriptionVideos = function(channel) {
 				// filter results by channel
 				// TODO: UI to choose between all new videos or by channel
-				var populateList = function(data) {
+				var populateList = function(data, listId) {
 					var feed = data.feed;
 					var total = feed.openSearch$totalResults.$t;
 					
@@ -321,23 +321,34 @@
 						var video = mapEntryToVideo(entry);
 						// null means video not available for mobile
 						if (video != null) {							
-							$('#newvideos').append(getVideoListItem(video));
+							$('#' + listId).append(getVideoListItem(video));
 						}
 					}
 					
-					$('#newvideos').listview('refresh');
+					$('#' + listId).listview('refresh');
+					
+					if (listId == 'channelvideos') {								
+						$('div h1').append(document.createTextNode(channel + '\'s latest videos'));
+						$('#subscriptions_channel').page('destroy').page();
+					}
 				};
 				
+				var feedURL = apptime.Tube.URL.newSubscriptions;
+				
+				if (channel) {
+					feedURL = '&author=' + channel;
+				}
+				
 				if (DEBUG) {
-					populateList(newSubsData);
+					populateList(channelSubVidData, channel ? 'channelvideos' : 'newvideos');
 				} else {
 					$.ajax({
 						type : 'GET',
-						url : apptime.Tube.URL.newSubscriptions,
+						url : feedURL,
 						dataType : 'json',
 						headers : getAuthRequestHeaders(),
 						success : function(data, textStatus, jqXHR) {							
-							populateList(data);														
+							populateList(data, channel ? 'channelvideos' : 'newvideos');														
 						},
 						error : function(xhr, type) {
 							alert(type);
