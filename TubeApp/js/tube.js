@@ -400,9 +400,30 @@
 				}
 			};
 			
-			this.getSubscriptions = function() {
+			this.getSubscriptions = function() {				
+				var listid = getParameterByName('listid');
+				
+				if (listid != '') {
+					if ($('#' + listid).hasClass('hide')) {
+						// show listid
+						$('#' + listid).removeClass('hide');						
+						// hide the other list
+						$.grep($('[data-role=listview]'), function(el) {
+							if ($(el).attr('id') != listid && !$(el).hasClass('hide')) {
+								$(el).addClass('hide');
+							}
+						});
+						
+						// highlight tab
+						$('span[tabid="' + listid + '"]').addClass('current');
+						// unhighlight other tab
+						$('span[tabid!="' + listid + '"]').removeClass('current');
+						$('#subscriptions').page('destroy').page();
+					}					
+				}
+				
 				this.getNewSubscriptionVideos();
-				this.getSubscribedChannels();
+				this.getSubscribedChannels();				
 			};
 		}
 	};	
