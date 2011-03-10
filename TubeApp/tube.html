@@ -2,17 +2,19 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" id="viewport" content="initial-scale=1.0,user-scalable=no" />
+	<meta name="viewport" id="viewport" content="initial-scale=1.0,user-scalable=no" />
 	<link rel="stylesheet" href="dep/jquery.mobile_1.0a3/jquery.mobile_1.0a3.min.css" />
 	<link rel="stylesheet" href="dep/organictabs/organictabs.style.css" />
 	<script type="text/javascript" src="dep/jquery_1.5/jquery_1.5.min.js"></script>
 	<script type="text/javascript" src="dep/jquery.mobile_1.0a3/jquery.mobile_1.0a3.js"></script>
-    <script type="text/javascript" src="dep/organictabs/organictabs.jquery.js"></script>
-    <script type="text/javascript" src="dep/humane.js"></script>
+	<script type="text/javascript" src="dep/organictabs/organictabs.jquery.js"></script>
+	<script type="text/javascript" src="dep/humane.js"></script>
 	<script type="text/javascript" src="js/tube.js"></script>
 	<script type="text/javascript" src="js/cookies.js"></script>	
 	<script type="text/javascript" src="js/utils.js"></script>
 	<script type="text/javascript" src="test_browser_js/favData.js"></script>
+	<script type="text/javascript" src="test_browser_js/searchData.js"></script>
+	<script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>
 <script type='text/javascript'>
 </script>
 </head>
@@ -129,19 +131,34 @@
 <!-- /page -->
 
 
-<div data-role="page" id="videodetails">
+<div data-role="page" id="search">
 
 <div data-role="header" data-theme="e">
-<h1>[Video Title]</h1>
+<h1>Search Videos</h1>
 <a href="../../" data-icon="home" data-iconpos="notext"
 	data-direction="reverse" class="ui-btn-right jqm-home">Home</a></div>
 <!-- /header -->
 
 <div data-role="content">
-	<div id="detail" class="ui-body ui-body-d">
+	<div data-role="fieldcontain">
+    	<!-- label for="search">Search Term(s):</label -->
+    	<input type="search" name="searchterms" id="search" value="" />    	
 	</div>
+	<br><br>
+	<ul id="searchresults" data-role="listview">
+	</ul>
 </div>
 <!-- /content -->
+<script type="text/javascript">
+	$("#search").keyup(function(event) {
+		console.log('key up, event=' + event); 
+		if (event.keyCode == 13) {
+			//$("#id_of_button").click();
+			console.log('keyCode==13');
+			apptime.Tube.getInstance().search($('#search').val());
+		}
+	});
+</script>
 </div>
 <!-- /page -->
 

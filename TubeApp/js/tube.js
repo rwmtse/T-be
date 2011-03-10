@@ -137,18 +137,39 @@
 			 * Public members
 			 */
 			this.search = function(searchTerm) {
-				$.ajax({
-					type : 'GET',
-					url : apptime.Tube.URL.search + searchTerm,
-					dataType : 'json',
-					headers : getAuthRequestHeaders(),
-					success : function(data, textStatus, jqXHR) {
-					
-					},
-					error : function(xhr, type) {
-						
+				var populateList = function(feedData) {
+					var data = feedData.data;
+					var total = data.totalItems;
+
+					var maxItemsPerPage = data.itemsPerPage;
+					for ( var i = 0; i < data.items.length; i++) {
+						var video = data.items[i];
+									
+						if (video.content["1"]) {
+							// TODO bug, keep appending... repeating entries
+							$('#searchresults').append(getVideoListItem(video));
+						} else {
+							// not available for mobile?
+						}												
 					}
-				});
+					
+					$('#searchresults').listview('refresh');
+				};
+				
+				if (DEBUG) {
+					populateList(searchData);
+				} else {
+					$.ajax({
+						type : 'GET',
+						url : apptime.Tube.URL.search + searchTerm,
+						dataType : 'json',
+						success : function(data, textStatus, jqXHR) {
+							populateList(data);
+						},
+						error : function(xhr, type) {						
+						}
+					});
+				}
 			};
 			
 			this.getFavoritesFeed = function() {
