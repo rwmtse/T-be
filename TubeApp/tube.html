@@ -42,7 +42,7 @@
 <script type="text/javascript">	
 	$('#login').click(function() {
 		// consider using $('#username').val() and $('#password').val()
-		apptime.Tube.getInstance().login($('#username')[0].value, $('#password')[0].value);
+		apptime.Tube.getInstance().login($('#username').val(), $('#password').val());
 	});
 
 	$('#clearSession').click(function() {
@@ -78,8 +78,13 @@
 		</ul>
 <br><br><br><br><br><br><br><br><br><br><br>
 <script type="text/javascript">
+	var tube = apptime.Tube.getInstance();
+
 	$('[data-role=page]').live('pagebeforeshow', function(event) {
-		var $et = $(event.target);	
+		var $et = $(event.target);		
+		
+		tube.setActivePage(this);
+		
 		if ($et.length > 0) {
 /*			
 			if ($et[0].id == 'favorites') {
@@ -93,7 +98,7 @@
 				//	alert('redirect to login');
 				//	$.mobile.changePage('#login');
 				//} else {		
-					apptime.Tube.getInstance().getFavoritesFeed();
+					tube.getFavoritesFeed();
 				//}
 				break;
 				
@@ -142,7 +147,7 @@
 <div data-role="content">
 	<div data-role="fieldcontain">
     	<!-- label for="search">Search Term(s):</label -->
-    	<input type="search" name="searchterms" id="search" value="" />    	
+    	<input type="search" name="searchterm" id="searchterm" value="" />    	
 	</div>
 	<br><br>
 	<ul id="searchresults" data-role="listview">
@@ -151,11 +156,8 @@
 <!-- /content -->
 <script type="text/javascript">
 	$("#search").keyup(function(event) {
-		console.log('key up, event=' + event); 
 		if (event.keyCode == 13) {
-			//$("#id_of_button").click();
-			console.log('keyCode==13');
-			apptime.Tube.getInstance().search($('#search').val());
+			tube.search($('#searchterm').val());
 		}
 	});
 </script>

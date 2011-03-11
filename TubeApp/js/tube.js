@@ -11,6 +11,10 @@
 			// TODO developer should use their own key
 			var developerKey_ = 'AI39si69Wbij78SJ860QpZvcHTbHrnwedus7dSqKRsNysIRpd_Ax3w2CoptBCAstJsruuUyxZ2PGMrMJx7_Zj2dSY-ahKkxdvQ';
 			
+			var activePage_ = [];
+			
+			var activeList_ = [];
+			
 			var getAuthRequestHeaders = function() {
 				return {
 					'Authorization' : 'GoogleLogin auth=' + authKey_,
@@ -18,7 +22,7 @@
 				};
 			};
 			
-			var getVideoListItem = function(video) {		
+			var getVideoListItem = function(video, itemIndex) {		
 				var thumb = document.createElement('img');
 				$(thumb).attr('src', video.thumbnail.sqDefault);
 				$(thumb).addClass('ui-li-thumb');
@@ -56,6 +60,12 @@
 				$(metadata).append(uploader).append(separator).append(dateAdded).append($(separator).clone()).append(viewCount);
 				
 				var li = document.createElement('li');
+				
+				// store item index as an attribute in the <li>			
+				if (itemIndex) {
+					$(li).attr('item-index', itemIndex);
+				}
+				
 				$(li).append(thumb).append(title).append(desc).append(metadata).append(detailLink);
 				$(li).addClass('ui-li-has-thumb');
 						
@@ -65,9 +75,9 @@
 			var getRelatedVideosFeed = function(vid) {
 				var populateList = function(feedData) {
 					var data = feedData.data;
-					var total = data.totalItems;
-					//alert('total=' + total);		
+					var total = data.totalItems;	
 					var maxItemsPerPage = data.itemsPerPage;
+					var startIndex = data.startIndex;
 					
 					$('ul li span').append(document.createTextNode(data.totalItems));
 					
@@ -77,7 +87,7 @@
 						var video = data.items[i];
 									
 						if (video.content && video.content["1"]) {
-							$('#relatedvideos').append(getVideoListItem(video));
+							$('#relatedvideos').append(getVideoListItem(video, startIndex + i));
 						} else {
 							// not available for mobile?
 						}								
@@ -133,38 +143,68 @@
 				return null;
 			};
 			
+			var getLoadMoreButton = function() {
+				var button = document.createElement('input');
+				$(button).attr('type', 'button');
+				$(button).attr('value', 'Load More');
+				$(button).click(function(){
+					//apptime.Tube.getInstance().loadMore();
+					tube.loadMore();
+				});
+				
+				return button;
+			};
+			
+			var populateList = function(feedData, requestUrl) {
+				var data = feedData.data;
+				var total = data.totalItems;
+
+				var maxItemsPerPage = data.itemsPerPage;
+				var startIndex = data.startIndex;
+				var list = activeList_; //$('[data-role=listview]:visible');
+				
+				// store request URL as an attribute in <ul>
+				$(list).attr('request-url', requestUrl);
+				
+				for (var i = 0; i < data.items.length; i++) {
+					var video = data.items[i];
+					
+					if (!video.content && video.video.content) {
+						video = video.video;
+					}					
+					
+					if (video.content["1"]) {
+						// TODO bug, keep appending... repeating entries
+						$(list).append(getVideoListItem(video, i + startIndex));
+					} else {
+						// not available for mobile?							
+					}												
+				}
+				
+				// show "Load More" if there are more items to show
+				if (total > data.items.length + startIndex) {
+					$(list).append(getLoadMoreButton());
+				}
+				
+				$(list).listview('refresh');
+				$(activePage_).page('destroy').page();
+			};
+			
 			/*
 			 * Public members
 			 */
 			this.search = function(searchTerm) {
-				var populateList = function(feedData) {
-					var data = feedData.data;
-					var total = data.totalItems;
-
-					var maxItemsPerPage = data.itemsPerPage;
-					for ( var i = 0; i < data.items.length; i++) {
-						var video = data.items[i];
-									
-						if (video.content["1"]) {
-							// TODO bug, keep appending... repeating entries
-							$('#searchresults').append(getVideoListItem(video));
-						} else {
-							// not available for mobile?
-						}												
-					}
-					
-					$('#searchresults').listview('refresh');
-				};
+				var requestUrl = apptime.Tube.URL.search + searchTerm;
 				
 				if (DEBUG) {
-					populateList(searchData);
+					populateList(searchData, requestUrl);
 				} else {
 					$.ajax({
 						type : 'GET',
-						url : apptime.Tube.URL.search + searchTerm,
+						url : requestUrl,
 						dataType : 'json',
 						success : function(data, textStatus, jqXHR) {
-							populateList(data);
+							populateList(data, requestUrl);
 						},
 						error : function(xhr, type) {						
 						}
@@ -173,36 +213,18 @@
 			};
 			
 			this.getFavoritesFeed = function() {
-				var populateList = function(feedData) {
-					var data = feedData.data;
-					var total = data.totalItems;
-					
-					var maxItemsPerPage = data.itemsPerPage;
-					for ( var i = 0; i < data.items.length; i++) {
-						var item = data.items[i];
-						var video = item.video;
-									
-						if (video.content["1"]) {
-							// TODO bug, keep appending... repeating entries
-							$('#fav').append(getVideoListItem(video));
-						} else {
-							// not available for mobile?
-						}												
-					}
-					
-					$('#fav').listview('refresh');					
-				};
+				var requestUrl = apptime.Tube.URL.favorites;		
 				
 				if (DEBUG) {
-					populateList(favData);
+					populateList(favData, requestUrl);
 				} else {				
 					$.ajax( {
 						type : 'GET',
-						url : apptime.Tube.URL.favorites,
+						url : requestUrl,
 						dataType : 'json',
 						headers : getAuthRequestHeaders(),
 						success : function(data, textStatus, jqXHR) {
-							populateList(data);
+							populateList(data, requestUrl);
 						},
 						error : function(xhr, type) {
 							alert(type);
@@ -336,13 +358,14 @@
 				var populateList = function(data, listId) {
 					var feed = data.feed;
 					var total = feed.openSearch$totalResults.$t;
+					var startIndex = feed.openSearch$startIndex.$t;
 					
 					for (var i = 0; i < feed.entry.length; i++) {
 						var entry = feed.entry[i];
 						var video = mapEntryToVideo(entry);
 						// null means video not available for mobile
 						if (video != null) {							
-							$('#' + listId).append(getVideoListItem(video));
+							$('#' + listId).append(getVideoListItem(video, startIndex + i));
 						}
 					}
 					
@@ -445,6 +468,36 @@
 				
 				this.getNewSubscriptionVideos();
 				this.getSubscribedChannels();				
+			};
+			
+			this.loadMore = function() {
+				// list state info can be stored as attributes in the <ul>, e.g. request URL
+				// item index can be stored as an attribute in each <li>
+				// to get the last item index, get the last <li> and inspect the value of the attribute
+				// figure out what the start-index should be (based on last item index), and send request
+				var list = activeList_; //$('[data-role=listview]:visible');
+				var lastItem = $(list).find('li:last'); //$('[data-role=listview]:visible li:last');
+				var requestUrl = $(list).attr('request-url');
+				var lastItemIndex = parseInt($(lastItem).attr('item-index'));				
+				var containsStartIndex = (requestUrl.indexOf('start-index') != -1);
+				
+				if (!containsStartIndex) {
+					requestUrl += '&start-index=' + (lastItemIndex + 1); 
+				} else {
+					requestUrl = requestUrl.replace(/start-index=\d+/, 'start-index=' + (lastItemIndex + 1));
+				}
+			};
+			
+			this.setActivePage = function(page) {
+				activePage_ = page;
+				
+				if (page) {
+					this.setActiveList($(page).find('[data-role=listview]'));
+				}
+			};
+			
+			this.setActiveList = function(list) {
+				activeList_ = list;
 			};
 		}
 	};	
