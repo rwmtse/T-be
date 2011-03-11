@@ -157,7 +157,7 @@
 <script type="text/javascript">
 	$("#search").keyup(function(event) {
 		if (event.keyCode == 13) {
-			tube.search($('#searchterm').val());
+			apptime.Tube.getInstance().search($('#searchterm').val());
 		}
 	});
 </script>

@@ -148,8 +148,7 @@
 				$(button).attr('type', 'button');
 				$(button).attr('value', 'Load More');
 				$(button).click(function(){
-					//apptime.Tube.getInstance().loadMore();
-					tube.loadMore();
+					apptime.Tube.getInstance().loadMore();
 				});
 				
 				return button;
@@ -502,14 +501,18 @@
 		}
 	};	
 				
-	this.apptime.Tube.getInstance = function() {
-		var tube = null;				
+	this.apptime.Tube.getInstance = function() {				
 		var authKey = readCookie('Tube.authKey');
 		
-		if (authKey) {
-			tube = new apptime.Tube(authKey);
+		// tube is global
+		if (tube) {
+			return tube;
 		} else {
-			tube = new apptime.Tube();
+			if (authKey) {
+				tube = new apptime.Tube(authKey);
+			} else {
+				tube = new apptime.Tube();
+			}
 		}
 			
 		return tube;
