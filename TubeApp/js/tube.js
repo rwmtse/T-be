@@ -1,6 +1,6 @@
 (function () {
 	/** global flag to enable/disable debugging **/
-	DEBUG = true;
+	DEBUG = false;
 	
 	this.apptime = {
 		"Tube" : function(authKey) {
@@ -333,7 +333,8 @@
 						var AUTH = 'Auth=';
 						var index = jqXHR.responseText.indexOf(AUTH);
 						authKey_ = jqXHR.responseText.substring(index + AUTH.length, jqXHR.responseText.length - 1);			
-						createCookie('Tube.authKey', authKey_, 7); // TODO: store key for 7 days
+						//createCookie('Tube.authKey', authKey_, 7); // TODO: store key for 7 days
+						localStorage.setItem('Tube.authKey', authKey_);
 						alert('authKey=' + authKey_);
 						
 						if (!redirect) {
@@ -379,7 +380,7 @@
 				var feedURL = apptime.Tube.URL.newSubscriptions;
 				
 				if (channel) {
-					feedURL = '&author=' + channel;
+					feedURL += '&author=' + channel;
 				}
 				
 				if (DEBUG) {
@@ -501,20 +502,25 @@
 		}
 	};	
 				
-	this.apptime.Tube.getInstance = function() {				
+	this.apptime.Tube.getInstance = function() {
+		/*
 		var authKey = readCookie('Tube.authKey');
+		*/
+		
+		var authKey = localStorage.getItem('Tube.authKey');
+		var tube;
 		
 		// tube is global
-		if (tube) {
-			return tube;
-		} else {
+		//if (tube) {
+			//return tube;
+		//} else {
 			if (authKey) {
 				tube = new apptime.Tube(authKey);
 			} else {
 				tube = new apptime.Tube();
 			}
-		}
-			
+		//}
+											
 		return tube;
 	};
 	

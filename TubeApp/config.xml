@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <widget xmlns="http://www.w3.org/ns/widgets" xmlns:rim="http://www.blackberry.com/ns/widgets" version="1.0.0.0">
   <name>Tübe</name>
-  <access subdomains="true" uri="http://getfirebug.com/"/>
   <access subdomains="false" uri="*"/>
   <icon rim:hover="false" src="images/logo.png"/>
   <icon rim:hover="true" src="images/logo_glow.png"/>
