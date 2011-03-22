@@ -1,6 +1,6 @@
 (function () {
 	/** global flag to enable/disable debugging **/
-	DEBUG = false;
+	DEBUG = true;
 	
 	this.apptime = {
 		"Tube" : function(authKey) {
@@ -235,83 +235,95 @@
 			
 			this.getVideoDetail = function() {
 				var vid = getParameterByName('vid');
+				var populateDetail = function(data) {
+					var video = data.data;
+					$('div h1').append(document.createTextNode(video.title));
+					
+					var img = document.createElement('img');
+					$(img).attr('src', video.thumbnail.sqDefault);
+					
+					var span = document.createElement('span');
+					$(span).addClass('ui-li-aside');
+						
+					var uploaded = document.createElement('strong');
+					$(uploaded).append(document.createTextNode(humaneDate(video.uploaded.replace(/\.\d{3}/g,''))));
+					var br = document.createElement('br');
+					
+					var uploader = document.createElement('span');
+					$(uploader).append(document.createTextNode(video.uploader));
+					
+					var star = document.createElement('img');
+					$(star).attr('src', 'icons/star_full.png');
+					
+					var like = document.createElement('a');
+					$(like).attr('href', '#');
+					$(like).attr('data-icon', 'check');
+					$(like).attr('data-iconpos', 'notext');
+					$(like).attr('data-role', 'button');
+					$(like).append(document.createTextNode('Like'));
+			
+					var dislike = document.createElement('a');
+					$(dislike).attr('href', '#');
+					$(dislike).attr('data-icon', 'delete');
+					$(dislike).attr('data-iconpos', 'notext');
+					$(dislike).attr('data-role', 'button');
+					$(dislike).append(document.createTextNode('Dislike'));
+						
+					$(span).append(uploaded).append(br).append(uploader).append($(br).clone()).append(like).append(dislike);
+					
+					var desc = document.createElement('p');
+					$(desc).append(document.createTextNode(video.description));
+					
+					var fieldset = document.createElement('fieldset');
+					$(fieldset).addClass('ui-grid-a');
+					
+					var playDiv = document.createElement('div');
+					$(playDiv).addClass('ui-block-a');
+					var playButton = document.createElement('a'); //document.createElement('button');
+					//$(playButton).attr('type', 'submit');
+					$(playButton).attr('href', video.content['1']);
+					$(playButton).attr('data-role', 'button');
+					$(playButton).append(document.createTextNode('Play'));
+					$(playDiv).append(playButton);					
+
+					var shareDiv = document.createElement('div'); // TODO: don't know why it doesn't show like a dialog
+					$(shareDiv).addClass('ui-block-b');
+					var shareButton = document.createElement('a');
+					$(shareButton).attr('href', 'share.html?vid=' + vid);
+					$(shareButton).attr('data-role', 'button');
+					//$(shareButton).attr('data-inline', 'true');
+					$(shareButton).attr('data-rel', 'dialog');
+					$(shareButton).attr('data-transition', 'pop');
+					$(shareButton).attr('rel', 'external');
+					$(shareButton).append(document.createTextNode('Share'));
+					$(shareDiv).append(shareButton);
+					
+					$(fieldset).append(playDiv).append(shareDiv);
+					
+					$('#details').append(img).append(span).append(desc).append(fieldset);						
+					
+					// make sure dynamic elements get proper styles
+					$('#videodetails').page('destroy').page();
+					
+					getRelatedVideosFeed(vid);
+				};
+
+				if (DEBUG) {
+					populateDetail(vidData);
+				} else {
+				
 				
 				$.ajax( {
 					type : 'GET',
 					url : apptime.Tube.URL.videoDetail.replace('_vid_', vid),
 					dataType : 'json',
-					success : function(data, textStatus, jqXHR) {
-						var video = data.data;
-						$('div h1').append(document.createTextNode(video.title));
-						
-						var img = document.createElement('img');
-						$(img).attr('src', video.thumbnail.sqDefault);
-						
-						var span = document.createElement('span');
-						$(span).addClass('ui-li-aside');
-							
-						var uploaded = document.createElement('strong');
-						$(uploaded).append(document.createTextNode(humaneDate(video.uploaded.replace(/\.\d{3}/g,''))));
-						var br = document.createElement('br');
-						
-						var uploader = document.createElement('span');
-						$(uploader).append(document.createTextNode(video.uploader));
-						
-						var star = document.createElement('img');
-						$(star).attr('src', 'icons/star_full.png');
-						
-						var like = document.createElement('a');
-						$(like).attr('href', '#');
-						$(like).attr('data-icon', 'check');
-						$(like).attr('data-iconpos', 'notext');
-						$(like).attr('data-role', 'button');
-						$(like).append(document.createTextNode('Like'));
-				
-						var dislike = document.createElement('a');
-						$(dislike).attr('href', '#');
-						$(dislike).attr('data-icon', 'delete');
-						$(dislike).attr('data-iconpos', 'notext');
-						$(dislike).attr('data-role', 'button');
-						$(dislike).append(document.createTextNode('Dislike'));
-							
-						$(span).append(uploaded).append(br).append(uploader).append($(br).clone()).append(like).append(dislike);
-						
-						var desc = document.createElement('p');
-						$(desc).append(document.createTextNode(video.description));
-						
-						var fieldset = document.createElement('fieldset');
-						$(fieldset).addClass('ui-grid-a');
-						
-						var playDiv = document.createElement('div');
-						$(playDiv).addClass('ui-block-a');
-						var playButton = document.createElement('a'); //document.createElement('button');
-						//$(playButton).attr('type', 'submit');
-						$(playButton).attr('href',video.content['1']);
-						$(playButton).attr('data-role', 'button');
-						$(playButton).append(document.createTextNode('Play'));
-						$(playDiv).append(playButton);
-						
-						var shareDiv = document.createElement('div');
-						$(shareDiv).addClass('ui-block-b');
-						var shareButton = document.createElement('button');
-						$(shareButton).attr('type', 'submit');
-						$(shareButton).append(document.createTextNode('Share'));
-						$(shareDiv).append(shareButton);
-						
-						$(fieldset).append(playDiv).append(shareDiv);
-						
-						$('#details').append(img).append(span).append(desc).append(fieldset);						
-						
-						// make sure dynamic elements get proper styles
-						$('#videodetails').page('destroy').page();
-						
-						getRelatedVideosFeed(vid);
-					},
+					success : populateDetail,
 					error : function(xhr, type) {
 						alert(type);
 						alert(xhr.responseText);
 					}
-				});			
+				});
+				}
 			};
 			
 			this.login = function(username, password, redirect) {
@@ -470,6 +482,12 @@
 				this.getSubscribedChannels();				
 			};
 			
+			this.share = function(vid, dest) {
+				var vurl = apptime.Tube.URL_SHARE.videourl.replace('_vid_', vid);
+				var shareurl = eval('apptime.Tube.URL_SHARE.' + dest).replace('_vurl_', escape(vurl));								
+				blackberry.invoke.invoke(blackberry.invoke.APP_BROWSER, new blackberry.invoke.BrowserArguments(shareurl));
+			};
+			
 			this.loadMore = function() {
 				// list state info can be stored as attributes in the <ul>, e.g. request URL
 				// item index can be stored as an attribute in each <li>
@@ -544,5 +562,7 @@
 	this.apptime.Tube.URL.__defineGetter__('relatedVideos', function() { return 'http://gdata.youtube.com/feeds/api/videos/_vid_/related?v=2&alt=jsonc'; });
 	
 	this.apptime.Tube.URL_SHARE = {};
-	this.apptime.Tube.URL_SHARE.__defineGetter__('facebook', function() { return 'http://m.facebook.com/sharer.php'; });
+	this.apptime.Tube.URL_SHARE.__defineGetter__('facebook', function() { return 'http://m.facebook.com/sharer.php?u=_vurl_'; });
+	this.apptime.Tube.URL_SHARE.__defineGetter__('googlebuzz', function() { return 'http://www.google.com/buzz/post?url=_vurl_'; });
+	this.apptime.Tube.URL_SHARE.__defineGetter__('videourl', function() {return 'http://m.youtube.com/watch?v=_vid_'; });
 })();

@@ -1,0 +1,49 @@
+<!DOCTYPE html> 
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" id="viewport" content="initial-scale=1.0,user-scalable=no" />
+    <link rel="stylesheet" href="dep/jquery.mobile_1.0a3/jquery.mobile_1.0a3.min.css" />
+    <link rel="stylesheet" href="dep/organictabs/organictabs.style.css" />
+    <script type="text/javascript" src="dep/jquery_1.5/jquery_1.5.min.js"></script>
+    <script type="text/javascript" src="dep/jquery.mobile_1.0a3/jquery.mobile_1.0a3.js"></script>
+    <script type="text/javascript" src="dep/humane.js"></script>
+    <script type="text/javascript" src="js/tube.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
+</head>
+<body> 
+
+<div data-role="page" id="share">
+	<div data-role="header" data-theme="e" data-position="inline">
+		<h1>Share Video</h1>
+	</div>		
+	<div data-role="content">	
+		<!-- <a id="email" href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="c">Email</a> -->     
+		<a id="googlebuzz" href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="c">Google Buzz</a>       
+		<a id="facebook" href="#" data-role="button" data-rel="dialog" data-transition="slidedown" data-theme="c">Facebook</a>
+
+	</div><!-- /content -->
+<script type="text/javascript">
+	$('#email').click(function() {
+		// call "share"
+		apptime.Tube.getInstance().share(getParameterByName('vid'), 'email');
+		// go back to previous page
+	});
+	$('#googlebuzz').click(function() {
+		apptime.Tube.getInstance().share(getParameterByName('vid'), 'googlebuzz');
+		history.back();
+	});
+	$('#facebook').click(function() {
+		apptime.Tube.getInstance().share(getParameterByName('vid'), 'facebook');
+		history.back();
+	});
+</script>
+<script language="javascript">
+    //$(document).ready(function () {
+      //  $("#videodetails").page("destroy").page();
+    //});
+</script>			
+</div><!-- /page -->
+
+</body>
+</html>
